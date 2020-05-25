@@ -6,7 +6,7 @@ import Products from './pages/products/products.page';
 import Login from './pages/login/login.page';
 import Register from './pages/register/register.page';
 import Product from './pages/product/product.page';
-import FileUpload from './pages/file--upload/file-upload.page';
+import FileUpload from './pages/file-upload/file-upload.page';
 
 function App() {
   return (
