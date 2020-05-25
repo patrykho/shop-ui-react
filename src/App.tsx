@@ -7,6 +7,7 @@ import Login from './pages/login/login.page';
 import Register from './pages/register/register.page';
 import Product from './pages/product/product.page';
 import FileUpload from './pages/file-upload/file-upload.page';
+import UserProfile from './pages/user-panel/user-profile.page';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/login/" component={Login} />
           <Route path="/register/" component={Register} />
           <Route path="/uploud" component={FileUpload} />
+          <Route path="/profile" component={UserProfile} />
           <Route path="/:id" component={Product} />
         </Switch>
       </Router>
