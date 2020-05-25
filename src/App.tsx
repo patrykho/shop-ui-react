@@ -15,9 +15,9 @@ function App() {
       <Router>
         <Switch>
           <Route exact path="/" component={Products} />
-          <Route path="/login/" component={Login} />
-          <Route path="/register/" component={Register} />
-          <Route path="/uploud" component={FileUpload} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          <Route path="/upload" component={FileUpload} />
           <Route path="/profile" component={UserProfile} />
           <Route path="/:id" component={Product} />
         </Switch>
