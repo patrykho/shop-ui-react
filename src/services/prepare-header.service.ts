@@ -9,3 +9,14 @@ export const prepareHeader = () => {
   };
   return options ? options : {};
 };
+
+export const prepareHeaderWithFile = () => {
+  const token = getToken();
+  const options = {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  return options ? options : {};
+};

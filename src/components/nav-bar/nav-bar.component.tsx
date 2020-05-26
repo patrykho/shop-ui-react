@@ -73,6 +73,9 @@ const NavBar = (props: NavBarProps) => {
             )}
             {isLogin && (
               <>
+                <Button color="inherit">
+                  <Link to="/upload">Upload CSV</Link>
+                </Button>
                 <Button
                   onClick={() => {
                     removeToken();

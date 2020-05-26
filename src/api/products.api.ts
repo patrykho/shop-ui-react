@@ -1,8 +1,14 @@
 import axios from 'axios';
 
+import {
+  prepareHeader,
+  prepareHeaderWithFile,
+} from '../services/prepare-header.service';
+
 import { BASE_URL } from '../constants/app.constants';
+
 import { ProductI, ProductCreateI } from '../interfaces/product-interfaces';
-import { prepareHeader } from '../services/prepare-header.service';
+import { FileUploadI } from '../interfaces/file-upload-interface';
 
 const ProductApi = {
   async getAllProducts(): Promise<ProductI[]> {
@@ -40,6 +46,14 @@ const ProductApi = {
       `${BASE_URL}products/${id}`,
       product,
       prepareHeader()
+    );
+    return response.data;
+  },
+  async uploadFile(formData: FormData): Promise<FileUploadI> {
+    const response = await axios.post(
+      `${BASE_URL}products/upload`,
+      formData,
+      prepareHeaderWithFile()
     );
     return response.data;
   },
