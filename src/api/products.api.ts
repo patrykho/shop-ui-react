@@ -1,21 +1,26 @@
 import axios from 'axios';
 
 import { BASE_URL } from '../constants/app.constants';
-import { ProductsI } from '../interfaces/products-interfaces';
+import { ProductI, ProductCreateI } from '../interfaces/product-interfaces';
+import { prepareHeader } from '../services/prepare-header.service';
 
 const ProductApi = {
-  async getAllProducts(): Promise<ProductsI[]> {
+  async getAllProducts(): Promise<ProductI[]> {
     const response = await axios.get(`${BASE_URL}products`);
     return response.data;
   },
 
-  async getProduct(id: string): Promise<ProductsI> {
+  async getProduct(id: string): Promise<ProductI> {
     const response = await axios.get(`${BASE_URL}products/${id}`);
     return response.data;
   },
 
-  async createProduct(product: ProductsI): Promise<ProductsI> {
-    const response = await axios.post(`${BASE_URL}products`, product);
+  async createProduct(product: ProductCreateI): Promise<ProductI> {
+    const response = await axios.post(
+      `${BASE_URL}products`,
+      product,
+      prepareHeader()
+    );
     return response.data;
   },
 
@@ -24,7 +29,7 @@ const ProductApi = {
     return response.data;
   },
 
-  async updateProduct(id: string, product: ProductsI): Promise<ProductsI> {
+  async updateProduct(id: string, product: ProductI): Promise<ProductI> {
     const response = await axios.put(`${BASE_URL}products/${id}`, product);
     return response.data;
   },

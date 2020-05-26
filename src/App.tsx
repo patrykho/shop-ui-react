@@ -5,9 +5,10 @@ import './App.scss';
 import Products from './pages/products/products.page';
 import Login from './pages/login/login.page';
 import Register from './pages/register/register.page';
-import Product from './pages/product/product.page';
 import FileUpload from './pages/file-upload/file-upload.page';
 import UserProfile from './pages/user-panel/user-profile.page';
+import ProductCreate from './pages/product/product-create.page';
+import ProductEdit from './pages/product/product-edit.page';
 
 function App() {
   return (
@@ -19,7 +20,8 @@ function App() {
           <Route path="/register" component={Register} />
           <Route path="/upload" component={FileUpload} />
           <Route path="/profile" component={UserProfile} />
-          <Route path="/:id" component={Product} />
+          <Route path="/product/create" component={ProductCreate} />
+          <Route path="/product/edit/:id" component={ProductEdit} />
         </Switch>
       </Router>
     </>

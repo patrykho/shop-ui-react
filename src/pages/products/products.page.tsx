@@ -17,6 +17,7 @@ import {
 } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { Link } from 'react-router-dom';
 
 import { getToken } from '../../services/access-token.service';
 import { isTokenExpired } from '../../services/jwt-service';
@@ -25,7 +26,7 @@ import ProductApi from '../../api/products.api';
 import NavBar from '../../components/nav-bar/nav-bar.component';
 import ErrorMessages from '../../components/error-messages/error-messages.component';
 
-import { ProductsI } from '../../interfaces/products-interfaces';
+import { ProductI } from '../../interfaces/product-interfaces';
 import { CONNECTION_ERROR } from '../../constants/app.constants';
 
 interface ProductsProps {}
@@ -56,13 +57,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Products = (props: ProductsProps) => {
   const classes = useStyles();
-  const [products, setProducts] = useState<ProductsI[] | undefined>(undefined);
+  const [products, setProducts] = useState<ProductI[] | undefined>(undefined);
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchGetAllProducts = async () => {
     try {
-      const productsResponse: ProductsI[] = await ProductApi.getAllProducts();
+      const productsResponse: ProductI[] = await ProductApi.getAllProducts();
       if (Array.isArray(productsResponse)) {
         setProducts(productsResponse);
         setIsLoading(false);
@@ -91,13 +92,8 @@ const Products = (props: ProductsProps) => {
     <div>
       <NavBar isLogin={isLogin} onSetIsLogin={setIsLogin} />
       <Typography variant="h4">Products list</Typography>
-      <Button
-        disabled={!isLogin}
-        variant="outlined"
-        color="primary"
-        onClick={() => console.log('add Product')}
-      >
-        Add Product
+      <Button disabled={!isLogin} variant="outlined" color="primary">
+        <Link to="/product/create">Add Product</Link>
       </Button>
       {isLoading && (
         <Grid item xs={12}>
