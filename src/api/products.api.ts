@@ -11,7 +11,10 @@ const ProductApi = {
   },
 
   async getProduct(id: string): Promise<ProductI> {
-    const response = await axios.get(`${BASE_URL}products/${id}`);
+    const response = await axios.get(
+      `${BASE_URL}products/${id}`,
+      prepareHeader()
+    );
     return response.data;
   },
 
@@ -30,7 +33,11 @@ const ProductApi = {
   },
 
   async updateProduct(id: string, product: ProductI): Promise<ProductI> {
-    const response = await axios.put(`${BASE_URL}products/${id}`, product);
+    const response = await axios.put(
+      `${BASE_URL}products/${id}`,
+      product,
+      prepareHeader()
+    );
     return response.data;
   },
 };
