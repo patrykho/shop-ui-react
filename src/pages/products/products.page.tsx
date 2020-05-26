@@ -14,10 +14,17 @@ import {
   CircularProgress,
   Grid,
   Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
 } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useHistory } from 'react-router-dom';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
 import { getToken } from '../../services/access-token.service';
 import { isTokenExpired } from '../../services/jwt-service';
@@ -31,7 +38,9 @@ import { CONNECTION_ERROR } from '../../constants/app.constants';
 
 import './products.page.scss';
 
-interface ProductsProps {}
+function Alert(props: AlertProps) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,12 +66,76 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const Products = (props: ProductsProps) => {
+const Products = () => {
   const classes = useStyles();
-  const [products, setProducts] = useState<ProductI[] | undefined>(undefined);
+  const [products, setProducts] = useState<ProductI[]>([]);
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
+  const [open, setOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<number | undefined>(
+    undefined
+  );
+
+  const [openSnackBarError, setOpenSnackBarError] = useState(false);
+  const [openSnackBarSuccess, setOpenSnackBarSuccess] = useState(false);
+
+  const handleClickSnackBarError = () => {
+    setOpenSnackBarError(true);
+  };
+
+  const handleCloseSnackBarError = (
+    event?: React.SyntheticEvent,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    console.log(event);
+
+    setOpenSnackBarError(false);
+  };
+
+  const handleClickSnackBarSuccess = () => {
+    setOpenSnackBarSuccess(true);
+  };
+  const handleCloseSnackBarSuccess = (
+    event?: React.SyntheticEvent,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnackBarSuccess(false);
+  };
+
+  const handleClickOpen = (productId: number) => {
+    setProductToDelete(productId);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const fetchDeleteProduct = async () => {
+    if (productToDelete) {
+      try {
+        await ProductApi.deleteProduct(productToDelete);
+        if (products) {
+          setProducts((prev) =>
+            prev.filter((item) => item.id !== productToDelete)
+          );
+        }
+        setProductToDelete(undefined);
+        handleClickSnackBarSuccess();
+      } catch (error) {
+        handleClickSnackBarError();
+        console.error(error);
+      }
+    }
+  };
 
   const fetchGetAllProducts = async () => {
     try {
@@ -181,7 +254,9 @@ const Products = (props: ProductsProps) => {
                       disabled={!isLogin}
                       variant="contained"
                       color="secondary"
-                      onClick={() => console.log('delete Product', row.id)}
+                      onClick={() => {
+                        handleClickOpen(row.id);
+                      }}
                     >
                       <DeleteIcon />
                     </Button>
@@ -191,6 +266,50 @@ const Products = (props: ProductsProps) => {
           </TableBody>
         </Table>
       )}
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {'Do you want to delete the product id:'} {productToDelete}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Please confirm to remove the product
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary" variant="contained">
+            Cancel
+          </Button>
+          <Button
+            onClick={fetchDeleteProduct}
+            color="secondary"
+            variant="contained"
+            autoFocus
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={openSnackBarError}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackBarError}
+      >
+        <ErrorMessages errors={'The product could not be removed'} />
+      </Snackbar>
+      <Snackbar
+        open={openSnackBarSuccess}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackBarSuccess}
+      >
+        <Alert onClose={handleCloseSnackBarSuccess} severity="success">
+          Product successfully removed
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

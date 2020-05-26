@@ -27,8 +27,11 @@ const ProductApi = {
     return response.data;
   },
 
-  async deleteProduct(id: string): Promise<void> {
-    const response = await axios.post(`${BASE_URL}products`, id);
+  async deleteProduct(id: number): Promise<void> {
+    const response = await axios.delete(
+      `${BASE_URL}products/${id}`,
+      prepareHeader()
+    );
     return response.data;
   },
 
