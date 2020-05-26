@@ -11,44 +11,24 @@ import {
   makeStyles,
   createStyles,
   Theme,
+  CircularProgress,
+  Grid,
+  Paper,
 } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
+
 import { getToken } from '../../services/access-token.service';
 import { isTokenExpired } from '../../services/jwt-service';
+import ProductApi from '../../api/products.api';
+
 import NavBar from '../../components/nav-bar/nav-bar.component';
+import ErrorMessages from '../../components/error-messages/error-messages.component';
+
+import { ProductsI } from '../../interfaces/products-interfaces';
+import { CONNECTION_ERROR } from '../../constants/app.constants';
 
 interface ProductsProps {}
-
-const PRODUCTS = [
-  {
-    id: 3,
-    title: 'APPLE MacBook Pro 16 i5',
-    imageUrl:
-      'https://www.mediaexpert.pl/media/cache/gallery/product/2/295/116/565/1vjqtsjy/images/20/2097809/APPLE-MacBook-Pro-16-front.jpg',
-    description:
-      'Oto najpotężniejszy notebook od Apple. Stworzony dla twórców. Ma niesamowity wyświetlacz Retina o przekątnej 16 cali, superszybkie procesory, grafikę nowej generacji, najpojemniejszą baterię w historii MacBooka Pro, nową klawiaturę Magic Keyboard i olbrzymią pamięć masową. To najdoskonalszy sprzęt dla najbardziej wymagających profesjonalistów.',
-    price: 11224.33,
-  },
-  {
-    id: 1,
-    title: 'APPLE MacBook Pro 16 i5',
-    imageUrl:
-      'https://www.mediaexpert.pl/media/cache/gallery/product/2/295/116/565/1vjqtsjy/images/20/2097809/APPLE-MacBook-Pro-16-front.jpg',
-    description:
-      'Oto najpotężniejszy notebook od Apple. Stworzony dla twórców. Ma niesamowity wyświetlacz Retina o przekątnej 16 cali, superszybkie procesory, grafikę nowej generacji, najpojemniejszą baterię w historii MacBooka Pro, nową klawiaturę Magic Keyboard i olbrzymią pamięć masową. To najdoskonalszy sprzęt dla najbardziej wymagających profesjonalistów.',
-    price: 1111.44,
-  },
-  {
-    id: 4,
-    title: 'APPLE MacBook Pro 16 i5',
-    imageUrl:
-      'https://ww.mediaexpert.pl/media/cache/gallery/product/2/295/116/565/1vjqtsjy/images/20/2097809/APPLE-MacBook-Pro-16-front.jpg',
-    description:
-      'Oto najpotężniejszy notebook od Apple. Stworzony dla twórców. Ma niesamowity wyświetlacz Retina o przekątnej 16 cali, superszybkie procesory, grafikę nowej generacji, najpojemniejszą baterię w historii MacBooka Pro, nową klawiaturę Magic Keyboard i olbrzymią pamięć masową. To najdoskonalszy sprzęt dla najbardziej wymagających profesjonalistów.',
-    price: 11224.33,
-  },
-];
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -66,13 +46,32 @@ const useStyles = makeStyles((theme: Theme) =>
       width: theme.spacing(7),
       height: theme.spacing(7),
     },
+    paper: {
+      padding: theme.spacing(2),
+      textAlign: 'center',
+      color: theme.palette.text.secondary,
+    },
   })
 );
 
 const Products = (props: ProductsProps) => {
   const classes = useStyles();
-  const [products, setProducts] = useState(PRODUCTS);
+  const [products, setProducts] = useState<ProductsI[] | undefined>(undefined);
   const [isLogin, setIsLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchGetAllProducts = async () => {
+    try {
+      const productsResponse: ProductsI[] = await ProductApi.getAllProducts();
+      if (Array.isArray(productsResponse)) {
+        setProducts(productsResponse);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const token: string | null = getToken();
@@ -82,6 +81,10 @@ const Products = (props: ProductsProps) => {
         setIsLogin(true);
       }
     }
+  }, []);
+
+  useEffect(() => {
+    fetchGetAllProducts();
   }, []);
 
   return (
@@ -96,59 +99,76 @@ const Products = (props: ProductsProps) => {
       >
         Add Product
       </Button>
-
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>#</TableCell>
-            <TableCell>Image</TableCell>
-            <TableCell>Title</TableCell>
-            <TableCell>Price</TableCell>
-            <TableCell>Edit</TableCell>
-            <TableCell>Delete</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {products.map((row, index) => (
-            <TableRow key={row.id}>
-              <TableCell component="th" scope="row">
-                {index + 1}
-              </TableCell>
-              <TableCell>
-                <Avatar
-                  alt="Remy Sharp"
-                  src={row.imageUrl}
-                  className={classes.large}
-                />
-              </TableCell>
-              <TableCell>{row.title}</TableCell>
-
-              <TableCell>{row.price}</TableCell>
-
-              <TableCell>
-                <Button
-                  disabled={!isLogin}
-                  variant="contained"
-                  color="primary"
-                  onClick={() => console.log('edit Product', row.id)}
-                >
-                  <CreateIcon />
-                </Button>
-              </TableCell>
-              <TableCell>
-                <Button
-                  disabled={!isLogin}
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => console.log('delete Product', row.id)}
-                >
-                  <DeleteIcon />
-                </Button>
-              </TableCell>
+      {isLoading && (
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <CircularProgress disableShrink />
+          </Paper>
+        </Grid>
+      )}
+      {!isLoading && !products && (
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <ErrorMessages errors={CONNECTION_ERROR} />
+          </Paper>
+        </Grid>
+      )}
+      {!isLoading && products && (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>#</TableCell>
+              <TableCell>Image</TableCell>
+              <TableCell>Title</TableCell>
+              <TableCell>Price</TableCell>
+              <TableCell>Edit</TableCell>
+              <TableCell>Delete</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+
+          <TableBody>
+            {products &&
+              products.map((row, index) => (
+                <TableRow key={row.id}>
+                  <TableCell component="th" scope="row">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell>
+                    <Avatar
+                      alt="Profile"
+                      src={row.imageUrl}
+                      className={classes.large}
+                    />
+                  </TableCell>
+                  <TableCell>{row.title}</TableCell>
+
+                  <TableCell>{row.price}</TableCell>
+
+                  <TableCell>
+                    <Button
+                      disabled={!isLogin}
+                      variant="contained"
+                      color="primary"
+                      onClick={() => console.log('edit Product', row.id)}
+                    >
+                      <CreateIcon />
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      disabled={!isLogin}
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => console.log('delete Product', row.id)}
+                    >
+                      <DeleteIcon />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };
