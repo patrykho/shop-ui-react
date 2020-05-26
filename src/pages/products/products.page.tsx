@@ -17,7 +17,7 @@ import {
 } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { getToken } from '../../services/access-token.service';
 import { isTokenExpired } from '../../services/jwt-service';
@@ -28,6 +28,8 @@ import ErrorMessages from '../../components/error-messages/error-messages.compon
 
 import { ProductI } from '../../interfaces/product-interfaces';
 import { CONNECTION_ERROR } from '../../constants/app.constants';
+
+import './products.page.scss';
 
 interface ProductsProps {}
 
@@ -60,6 +62,7 @@ const Products = (props: ProductsProps) => {
   const [products, setProducts] = useState<ProductI[] | undefined>(undefined);
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const history = useHistory();
 
   const fetchGetAllProducts = async () => {
     try {
@@ -88,13 +91,34 @@ const Products = (props: ProductsProps) => {
     fetchGetAllProducts();
   }, []);
 
+  const handleRedirect = (path: string) => {
+    history.push(path);
+  };
+
   return (
     <div>
       <NavBar isLogin={isLogin} onSetIsLogin={setIsLogin} />
-      <Typography variant="h4">Products list</Typography>
-      <Button disabled={!isLogin} variant="outlined" color="primary">
-        <Link to="/product/create">Add Product</Link>
-      </Button>
+      <Grid container justify="center">
+        <Grid className="products-list-title" item>
+          <Typography variant="h4">Products list</Typography>
+        </Grid>
+      </Grid>
+
+      <Grid container justify="flex-end">
+        <Grid className="products-list-button" item>
+          <Button
+            disabled={!isLogin}
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              handleRedirect('/product/create');
+            }}
+          >
+            Add Product
+          </Button>
+        </Grid>
+      </Grid>
+
       {isLoading && (
         <Grid item xs={12}>
           <Paper className={classes.paper}>
@@ -145,7 +169,9 @@ const Products = (props: ProductsProps) => {
                       disabled={!isLogin}
                       variant="contained"
                       color="primary"
-                      onClick={() => console.log('edit Product', row.id)}
+                      onClick={() => {
+                        handleRedirect(`/product/edit/${row.id}`);
+                      }}
                     >
                       <CreateIcon />
                     </Button>
