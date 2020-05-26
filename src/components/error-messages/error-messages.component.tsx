@@ -1,7 +1,7 @@
 import React from 'react';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
-import './error-messages.scss';
+import './error-messages.component.scss';
 interface ErrorMessagesProps {
   errors: string[] | string;
 }

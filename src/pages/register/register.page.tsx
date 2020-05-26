@@ -15,7 +15,7 @@ import { Redirect } from 'react-router-dom';
 
 import AuthApi from '../../api/auth.api';
 import useFormState from '../../hooks/use-form-state';
-import ErrorMessages from '../../components/error-messages';
+import ErrorMessages from '../../components/error-messages/error-messages.component';
 import { removeToken } from '../../services/access-token.service';
 
 import { RegisterDataI } from '../../interfaces/register-data-interface';
