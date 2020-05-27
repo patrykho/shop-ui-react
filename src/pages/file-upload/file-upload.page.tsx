@@ -12,9 +12,9 @@ import {
 } from '@material-ui/core';
 import PublishIcon from '@material-ui/icons/Publish';
 
-import ErrorMessages from '../../components/error-messages/error-messages.component';
+import AlertMessages from '../../components/alert-messages/alert-messages.component';
 import ProductApi from '../../api/products.api';
-import { Severity } from '../../components/error-messages/error-messages.component';
+import { Severity } from '../../components/alert-messages/alert-messages.component';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -82,9 +82,9 @@ const FileUpload = () => {
         <Typography component="h1" variant="h5">
           Upload CSV file
         </Typography>
-        {error && <ErrorMessages errors={error} />}
+        {error && <AlertMessages messages={error} />}
         {success && !error && (
-          <ErrorMessages errors={success} severity={Severity.success} />
+          <AlertMessages messages={success} severity={Severity.success} />
         )}
         <form className={classes.form} noValidate>
           <TextField

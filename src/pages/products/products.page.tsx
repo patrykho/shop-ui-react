@@ -31,7 +31,7 @@ import { isTokenExpired } from '../../services/jwt-service';
 import ProductApi from '../../api/products.api';
 
 import NavBar from '../../components/nav-bar/nav-bar.component';
-import ErrorMessages from '../../components/error-messages/error-messages.component';
+import AlertMessages from '../../components/alert-messages/alert-messages.component';
 
 import { ProductI } from '../../interfaces/product-interfaces';
 import { CONNECTION_ERROR } from '../../constants/app.constants';
@@ -68,6 +68,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Products = () => {
   const classes = useStyles();
+  const [error, setError] = useState<undefined | string | string[]>();
   const [products, setProducts] = useState<ProductI[]>([]);
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -145,7 +146,13 @@ const Products = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      console.error(error);
+      let errorResponse;
+      if (error.response && error.response.data.message) {
+        errorResponse = error.response.data.message;
+      } else {
+        errorResponse = CONNECTION_ERROR;
+      }
+      setError(errorResponse);
       setIsLoading(false);
     }
   };
@@ -176,7 +183,6 @@ const Products = () => {
           <Typography variant="h4">Products list</Typography>
         </Grid>
       </Grid>
-
       <Grid container justify="flex-end">
         <Grid className="products-list-button" item>
           <Button
@@ -191,7 +197,11 @@ const Products = () => {
           </Button>
         </Grid>
       </Grid>
-
+      <Grid container justify="center">
+        <Grid className="products-list-title" item>
+          {error && <AlertMessages messages={error} />}
+        </Grid>
+      </Grid>
       {isLoading && (
         <Grid item xs={12}>
           <Paper className={classes.paper}>
@@ -199,73 +209,65 @@ const Products = () => {
           </Paper>
         </Grid>
       )}
-      {!isLoading && !products && (
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <ErrorMessages errors={CONNECTION_ERROR} />
-          </Paper>
-        </Grid>
-      )}
-      {!isLoading && products && (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Image</TableCell>
-              <TableCell>Title</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Edit</TableCell>
-              <TableCell>Delete</TableCell>
-            </TableRow>
-          </TableHead>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>#</TableCell>
+            <TableCell>Image</TableCell>
+            <TableCell>Title</TableCell>
+            <TableCell>Price</TableCell>
+            <TableCell>Edit</TableCell>
+            <TableCell>Delete</TableCell>
+          </TableRow>
+        </TableHead>
 
-          <TableBody>
-            {products &&
-              products.map((row, index) => (
-                <TableRow key={row.id}>
-                  <TableCell component="th" scope="row">
-                    {index + 1}
-                  </TableCell>
-                  <TableCell>
-                    <Avatar
-                      alt="Profile"
-                      src={row.imageUrl}
-                      className={classes.large}
-                    />
-                  </TableCell>
-                  <TableCell>{row.title}</TableCell>
+        <TableBody>
+          {products &&
+            products.map((row, index) => (
+              <TableRow key={row.id}>
+                <TableCell component="th" scope="row">
+                  {index + 1}
+                </TableCell>
+                <TableCell>
+                  <Avatar
+                    alt="Profile"
+                    src={row.imageUrl}
+                    className={classes.large}
+                  />
+                </TableCell>
+                <TableCell>{row.title}</TableCell>
 
-                  <TableCell>{row.price}</TableCell>
+                <TableCell>{row.price}</TableCell>
 
-                  <TableCell>
-                    <Button
-                      disabled={!isLogin}
-                      variant="contained"
-                      color="primary"
-                      onClick={() => {
-                        handleRedirect(`/product/edit/${row.id}`);
-                      }}
-                    >
-                      <CreateIcon />
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      disabled={!isLogin}
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => {
-                        handleClickOpen(row.id);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      )}
+                <TableCell>
+                  <Button
+                    disabled={!isLogin}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      handleRedirect(`/product/edit/${row.id}`);
+                    }}
+                  >
+                    <CreateIcon />
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    disabled={!isLogin}
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => {
+                      handleClickOpen(row.id);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+
       <Dialog
         open={open}
         onClose={handleClose}
@@ -299,7 +301,7 @@ const Products = () => {
         autoHideDuration={6000}
         onClose={handleCloseSnackBarError}
       >
-        <ErrorMessages errors={'The product could not be removed'} />
+        <AlertMessages messages={'The product could not be removed'} />
       </Snackbar>
       <Snackbar
         open={openSnackBarSuccess}

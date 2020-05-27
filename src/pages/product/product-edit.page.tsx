@@ -16,7 +16,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { Redirect, RouteComponentProps } from 'react-router-dom';
 
 import useFormState from '../../hooks/use-form-state';
-import ErrorMessages from '../../components/error-messages/error-messages.component';
+import AlertMessages from '../../components/alert-messages/alert-messages.component';
 
 import ProductApi from '../../api/products.api';
 import { ProductI } from '../../interfaces/product-interfaces';
@@ -66,7 +66,12 @@ const ProductEdit = ({ match }: RouteComponentProps<TParams>) => {
         setIsLoading(false);
       }
     } catch (error) {
-      const errorResponse = error.response.data.message;
+      let errorResponse;
+      if (error.response && error.response.data.message) {
+        errorResponse = error.response.data.message;
+      } else {
+        errorResponse = 'Network Error';
+      }
       setError(errorResponse);
       setIsLoading(false);
     }
@@ -104,7 +109,12 @@ const ProductEdit = ({ match }: RouteComponentProps<TParams>) => {
       await ProductApi.updateProduct(id, formState);
       setIsEdited(true);
     } catch (error) {
-      const errorResponse = error.response.data.message;
+      let errorResponse;
+      if (error.response && error.response.data.message) {
+        errorResponse = error.response.data.message;
+      } else {
+        errorResponse = 'Network Error';
+      }
       setError(errorResponse);
     }
   };
@@ -130,7 +140,7 @@ const ProductEdit = ({ match }: RouteComponentProps<TParams>) => {
         <Typography component="h1" variant="h5">
           Edit product
         </Typography>
-        {error && <ErrorMessages errors={error} />}
+        {error && <AlertMessages messages={error} />}
         <form className={classes.form}>
           <Grid container spacing={2}>
             <Grid item xs={12}>

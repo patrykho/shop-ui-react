@@ -14,10 +14,11 @@ import AddIcon from '@material-ui/icons/Add';
 import { Redirect } from 'react-router-dom';
 
 import useFormState from '../../hooks/use-form-state';
-import ErrorMessages from '../../components/error-messages/error-messages.component';
+import AlertMessages from '../../components/alert-messages/alert-messages.component';
 
 import ProductApi from '../../api/products.api';
 import { ProductCreateI } from '../../interfaces/product-interfaces';
+import { CONNECTION_ERROR } from '../../constants/app.constants';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -69,7 +70,13 @@ const ProductCreate = () => {
       await ProductApi.createProduct(formState);
       setIsCreated(true);
     } catch (error) {
-      const errorResponse = error.response.data.message;
+      let errorResponse;
+      if (error.response && error.response.data.message) {
+        errorResponse = error.response.data.message;
+      } else {
+        errorResponse = CONNECTION_ERROR;
+      }
+
       setError(errorResponse);
     }
   };
@@ -97,7 +104,7 @@ const ProductCreate = () => {
         <Typography component="h1" variant="h5">
           Create new product
         </Typography>
-        {error && <ErrorMessages errors={error} />}
+        {error && <AlertMessages messages={error} />}
         <form className={classes.form}>
           <Grid container spacing={2}>
             <Grid item xs={12}>

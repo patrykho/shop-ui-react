@@ -15,10 +15,11 @@ import { Redirect } from 'react-router-dom';
 
 import AuthApi from '../../api/auth.api';
 import useFormState from '../../hooks/use-form-state';
-import ErrorMessages from '../../components/error-messages/error-messages.component';
+import AlertMessages from '../../components/alert-messages/alert-messages.component';
 import { removeToken } from '../../services/access-token.service';
 
 import { RegisterDataI } from '../../interfaces/register-data-interface';
+import { CONNECTION_ERROR } from '../../constants/app.constants';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -66,7 +67,12 @@ const Register = () => {
       removeToken();
       setIsRegister(true);
     } catch (error) {
-      const errorResponse = error.response.data.message;
+      let errorResponse;
+      if (error.response && error.response.data.message) {
+        errorResponse = error.response.data.message;
+      } else {
+        errorResponse = CONNECTION_ERROR;
+      }
       setError(errorResponse);
     }
   };
@@ -94,7 +100,7 @@ const Register = () => {
         <Typography component="h1" variant="h5">
           Register
         </Typography>
-        {error && <ErrorMessages errors={error} />}
+        {error && <AlertMessages messages={error} />}
         <form className={classes.form}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
-import './error-messages.component.scss';
+import './alert-messages.component.scss';
 
 export enum Severity {
   error = 'error',
@@ -9,8 +9,8 @@ export enum Severity {
   success = 'success',
   warning = 'warning',
 }
-interface ErrorMessagesProps {
-  errors: string[] | string;
+interface AlertMessagesProps {
+  messages: string[] | string;
   severity?: Severity;
 }
 
@@ -18,26 +18,26 @@ function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const ErrorMessages = (props: ErrorMessagesProps) => {
-  const { errors, severity } = props;
+const AlertMessages = (props: AlertMessagesProps) => {
+  const { messages, severity } = props;
   return (
     <>
-      {Array.isArray(errors) && (
+      {Array.isArray(messages) && (
         <div>
-          {Array.isArray(errors) &&
-            errors.map((item) => (
+          {Array.isArray(messages) &&
+            messages.map((item) => (
               <Alert severity={severity ? severity : 'error'}>{item}</Alert>
             ))}
         </div>
       )}
 
-      {typeof errors === 'string' && (
+      {typeof messages === 'string' && (
         <div>
-          <Alert severity={severity ? severity : 'error'}>{errors}</Alert>
+          <Alert severity={severity ? severity : 'error'}>{messages}</Alert>
         </div>
       )}
     </>
   );
 };
 
-export default ErrorMessages;
+export default AlertMessages;

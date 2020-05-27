@@ -22,9 +22,10 @@ import {
 
 import AuthApi from '../../api/auth.api';
 import useFormState from '../../hooks/use-form-state';
-import ErrorMessages from '../../components/error-messages/error-messages.component';
+import AlertMessages from '../../components/alert-messages/alert-messages.component';
 import { setToken, getToken } from '../../services/access-token.service';
 import { isTokenExpired } from '../../services/jwt-service';
+import { CONNECTION_ERROR } from '../../constants/app.constants';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -81,7 +82,12 @@ const Login = () => {
       setToken(response.accessToken);
       setIsLogin(true);
     } catch (error) {
-      const errorResponse = error.response.data.message;
+      let errorResponse;
+      if (error.response && error.response.data.message) {
+        errorResponse = error.response.data.message;
+      } else {
+        errorResponse = CONNECTION_ERROR;
+      }
       setError(errorResponse);
       setIsLogin(false);
     }
@@ -110,7 +116,7 @@ const Login = () => {
         <Typography component="h1" variant="h5">
           Login
         </Typography>
-        {error && <ErrorMessages errors={error} />}
+        {error && <AlertMessages messages={error} />}
         <form className={classes.form} noValidate>
           <TextField
             variant="outlined"
