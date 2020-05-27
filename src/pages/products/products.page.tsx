@@ -24,7 +24,6 @@ import {
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useHistory } from 'react-router-dom';
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
 import { getToken } from '../../services/access-token.service';
 import { isTokenExpired } from '../../services/jwt-service';
@@ -34,13 +33,14 @@ import NavBar from '../../components/nav-bar/nav-bar.component';
 import AlertMessages from '../../components/alert-messages/alert-messages.component';
 
 import { ProductI } from '../../interfaces/product-interfaces';
-import { CONNECTION_ERROR } from '../../constants/app.constants';
+import {
+  CONNECTION_ERROR,
+  PRODUCT_REMOVED_FAILED,
+  PRODUCT_REMOVED_SUCCESS,
+} from '../../constants/app.constants';
 
 import './products.page.scss';
-
-function Alert(props: AlertProps) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+import { Severity } from '../../components/alert-messages/alert-messages.component';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -85,30 +85,8 @@ const Products = () => {
     setOpenSnackBarError(true);
   };
 
-  const handleCloseSnackBarError = (
-    event?: React.SyntheticEvent,
-    reason?: string
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    console.log(event);
-
-    setOpenSnackBarError(false);
-  };
-
   const handleClickSnackBarSuccess = () => {
     setOpenSnackBarSuccess(true);
-  };
-  const handleCloseSnackBarSuccess = (
-    event?: React.SyntheticEvent,
-    reason?: string
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setOpenSnackBarSuccess(false);
   };
 
   const handleClickOpen = (productId: number) => {
@@ -131,9 +109,17 @@ const Products = () => {
         }
         setProductToDelete(undefined);
         handleClickSnackBarSuccess();
+        handleClose();
       } catch (error) {
+        let errorResponse;
+        if (error.response && error.response.data.message) {
+          errorResponse = error.response.data.message;
+        } else {
+          errorResponse = CONNECTION_ERROR;
+        }
+        setError(errorResponse);
         handleClickSnackBarError();
-        console.error(error);
+        handleClose();
       }
     }
   };
@@ -296,21 +282,14 @@ const Products = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        open={openSnackBarError}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackBarError}
-      >
-        <AlertMessages messages={'The product could not be removed'} />
+      <Snackbar open={openSnackBarError} autoHideDuration={6000}>
+        <AlertMessages messages={PRODUCT_REMOVED_FAILED} />
       </Snackbar>
-      <Snackbar
-        open={openSnackBarSuccess}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackBarSuccess}
-      >
-        <Alert onClose={handleCloseSnackBarSuccess} severity="success">
-          Product successfully removed
-        </Alert>
+      <Snackbar open={openSnackBarSuccess} autoHideDuration={6000}>
+        <AlertMessages
+          messages={PRODUCT_REMOVED_SUCCESS}
+          severity={Severity.success}
+        />
       </Snackbar>
     </div>
   );
